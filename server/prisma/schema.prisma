@@ -1,0 +1,227 @@
+// Prisma Schema for ProcessPilot AI
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  AWAITING_APPROVAL
+  COMPLETED
+  FAILED
+  RETRYING
+  CANCELLED
+}
+
+enum AgentType {
+  PLANNER
+  DECISION
+  EXECUTION
+  VALIDATION
+  RECOVERY
+  MONITORING
+}
+
+enum LogLevel {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ApprovalTriggerReason {
+  THRESHOLD
+  LOW_CONFIDENCE
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(OPERATOR)
+  canApprove   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLogin    DateTime?
+
+  workflows        Workflow[]        @relation("WorkflowOwner")
+  workflowVersions WorkflowVersion[] @relation("CreatedVersions")
+  approvalsCreated Approval[]        @relation("RequestedApprovals")
+  approvalsActioned Approval[]       @relation("ApprovedApprovals")
+  notifications    Notification[]    @relation("UserNotifications")
+  integrations     Integration[]     @relation("UserIntegrations")
+
+  @@map("users")
+}
+
+model Workflow {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  sourceSopText String?        @db.Text
+  ownerId       String
+  status        WorkflowStatus @default(DRAFT)
+  version       Int            @default(1)
+  triggerConfig Json?
+  nodes         Json
+  edges         Json
+  variables     Json?
+  approvalRules Json?
+  tags          String[]       @default([])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  owner            User              @relation("WorkflowOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  versions         WorkflowVersion[]
+  executions       Execution[]
+  executionLogs    ExecutionLog[]
+  approvals        Approval[]
+  notifications    Notification[]
+
+  @@map("workflows")
+}
+
+model WorkflowVersion {
+  id         String   @id @default(uuid())
+  workflowId String
+  version    Int
+  snapshot   Json
+  createdBy  String
+  createdAt  DateTime @default(now())
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  creator  User     @relation("CreatedVersions", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@unique([workflowId, version])
+  @@map("workflow_versions")
+}
+
+model Execution {
+  id               String          @id @default(uuid())
+  workflowId       String
+  workflowVersion  Int             @default(1)
+  workflowSnapshot Json
+  status           ExecutionStatus @default(PENDING)
+  currentNode      String?
+  inputs           Json?
+  outputs          Json?
+  error            Json?
+  retryCount       Int             @default(0)
+  aiCallCount      Int             @default(0)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  duration         Int?            // Milliseconds
+  triggerType      String          @default("MANUAL")
+  createdAt        DateTime        @default(now())
+
+  workflow      Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  executionLogs ExecutionLog[]
+  approvals     Approval[]
+  notifications Notification[]
+
+  @@map("executions")
+}
+
+model ExecutionLog {
+  id              String    @id @default(uuid())
+  executionId     String
+  workflowId      String
+  nodeId          String?
+  agent           AgentType
+  level           LogLevel  @default(INFO)
+  message         String
+  reasoningTrace  String?   @db.Text
+  confidenceScore Float?
+  metadata        Json?
+  timestamp       DateTime  @default(now())
+
+  execution Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow  Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@map("execution_logs")
+}
+
+model Approval {
+  id            String                @id @default(uuid())
+  executionId   String
+  workflowId    String
+  nodeId        String
+  requestedBy   String?
+  approvedBy    String?
+  status        ApprovalStatus        @default(PENDING)
+  triggerReason ApprovalTriggerReason
+  reason        String?
+  metadata      Json?
+  createdAt     DateTime              @default(now())
+  resolvedAt    DateTime?
+
+  execution Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow  Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  requester User?     @relation("RequestedApprovals", fields: [requestedBy], references: [id], onDelete: SetNull)
+  approver  User?     @relation("ApprovedApprovals", fields: [approvedBy], references: [id], onDelete: SetNull)
+
+  @@map("approvals")
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  ownerId     String
+  workflowId  String?
+  executionId String?
+  type        String
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  owner     User       @relation("UserNotifications", fields: [ownerId], references: [id], onDelete: Cascade)
+  workflow  Workflow?  @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  execution Execution? @relation(fields: [executionId], references: [id], onDelete: SetNull)
+
+  @@map("notifications")
+}
+
+model Integration {
+  id                    String   @id @default(uuid())
+  ownerId               String
+  provider              String
+  status                String   @default("ACTIVE")
+  encryptedAccessToken  String
+  encryptedRefreshToken String?
+  scopes                String[] @default([])
+  expiresAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  owner User @relation("UserIntegrations", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
