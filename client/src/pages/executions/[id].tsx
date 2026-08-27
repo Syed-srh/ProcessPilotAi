@@ -16,6 +16,8 @@ import {
   Clock,
   Terminal,
   FileCode,
+  BookOpen,
+  Quote,
 } from 'lucide-react';
 
 export default function ExecutionTimelinePage() {
@@ -177,34 +179,58 @@ export default function ExecutionTimelinePage() {
               {logs.length === 0 ? (
                 <div className="text-center py-12 text-slate-500">No agent logs recorded.</div>
               ) : (
-                logs.map((log, index) => (
-                  <div
-                    key={log.id || index}
-                    className="p-4 rounded-2xl bg-slate-900/80 border border-border hover:border-indigo-500/30 transition-all space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {getAgentBadge(log.agent)}
-                        {log.confidenceScore !== undefined && log.confidenceScore !== null && (
-                          <span className="text-[10px] text-cyan-400 font-bold">
-                            Confidence: {(log.confidenceScore * 100).toFixed(0)}%
-                          </span>
-                        )}
+                logs.map((log, index) => {
+                  const isRagGrounded = (log.reasoningTrace || '').includes('RAG_GROUNDED');
+                  const isHardcodedFallback = (log.reasoningTrace || '').includes('HARDCODED_FALLBACK');
+
+                  return (
+                    <div
+                      key={log.id || index}
+                      className="p-4 rounded-2xl bg-slate-900/80 border border-border hover:border-indigo-500/30 transition-all space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getAgentBadge(log.agent)}
+                          {log.confidenceScore !== undefined && log.confidenceScore !== null && (
+                            <span className="text-[10px] text-cyan-400 font-bold">
+                              Confidence: {(log.confidenceScore * 100).toFixed(0)}%
+                            </span>
+                          )}
+                          {isRagGrounded && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                              <BookOpen className="w-3 h-3" /> RAG GROUNDED
+                            </span>
+                          )}
+                          {isHardcodedFallback && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                              HARDCODED FALLBACK
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </span>
+
+                      <p className="text-slate-200 font-semibold leading-relaxed">{log.message}</p>
+
+                      {log.reasoningTrace && (
+                        <div className={`p-3 rounded-xl border text-[11px] font-mono leading-relaxed space-y-1 ${
+                          isRagGrounded
+                            ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-200'
+                            : 'bg-slate-950/80 border-slate-800 text-slate-400'
+                        }`}>
+                          {isRagGrounded && (
+                            <div className="flex items-center gap-1.5 font-bold text-emerald-400 text-[10px] uppercase mb-1">
+                              <Quote className="w-3 h-3" /> Cited Refund Policy Clause
+                            </div>
+                          )}
+                          <div>"{log.reasoningTrace}"</div>
+                        </div>
+                      )}
                     </div>
-
-                    <p className="text-slate-200 font-semibold leading-relaxed">{log.message}</p>
-
-                    {log.reasoningTrace && (
-                      <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 italic">
-                        "{log.reasoningTrace}"
-                      </div>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

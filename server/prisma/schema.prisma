@@ -225,3 +225,30 @@ model Integration {
 
   @@map("integrations")
 }
+
+model KnowledgeDocument {
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.Text
+  mimeType  String   @default("text/plain")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chunks KnowledgeChunk[]
+
+  @@map("knowledge_documents")
+}
+
+model KnowledgeChunk {
+  id         String   @id @default(uuid())
+  documentId String
+  chunkIndex Int
+  content    String   @db.Text
+  embedding  Json?    // Vector embedding represented as JSON float array for cross-env compatibility
+  createdAt  DateTime @default(now())
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("knowledge_chunks")
+}
+

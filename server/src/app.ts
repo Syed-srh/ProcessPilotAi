@@ -8,6 +8,7 @@ import workflowRoutes from './routes/workflowRoutes';
 import approvalRoutes from './routes/approvalRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import executionRoutes from './routes/executionRoutes';
+import knowledgeRoutes from './routes/knowledgeRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { env } from './config/env';
 
@@ -73,6 +74,7 @@ app.use('/api/workflows', workflowRoutes);
 app.use('/api/approvals', approvalRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/executions', executionRoutes);
+app.use('/api/knowledge', knowledgeRoutes);
 
 // Central error handler
 app.use(errorHandler);
