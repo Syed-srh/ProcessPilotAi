@@ -46,7 +46,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { user, token } = response.data.data;
       get().setAuth(user, token);
     } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Registration failed.';
+      const message = err.response?.data?.error?.message || err.message || 'Unable to connect to backend server. Please verify API URL.';
       set({ error: message, isLoading: false, isAuthenticated: false });
       throw new Error(message);
     }
