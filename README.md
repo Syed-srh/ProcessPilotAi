@@ -95,23 +95,19 @@ This manual process is **slow, error-prone, unscalable, and lacks transparent au
 
 ---
 
-## 5. Screenshots
+## 5. Project includes
 
 ### 📊 1. Workflows Library & Management
 *Manage, search, duplicate, and create visual workflow graphs.*
-![Workflows Library](https://raw.githubusercontent.com/Syed-srh/ProcessPilotAi/main/docs/screenshots/workflows_library.png)
 
 ### 🎨 2. Interactive React Flow Canvas
-*Drag-and-drop workflow canvas with custom node palette and configuration drawer.*
-![Workflow Canvas](https://raw.githubusercontent.com/Syed-srh/ProcessPilotAi/main/docs/screenshots/workflow_canvas.png)
+*Drag-and-drop workflow canvas with custom node palette and configuration drawer.*   
 
 ### 📬 3. Pending Approvals Inbox (Human-in-the-Loop)
 *Review paused high-risk executions with reasoning traces, threshold badges, and authorization controls.*
-![Approvals Inbox](https://raw.githubusercontent.com/Syed-srh/ProcessPilotAi/main/docs/screenshots/approvals_inbox.png)
 
 ### 📜 4. Real-Time Multi-Agent Execution Telemetry Log
 *Step-by-step agent telemetry streaming live over WebSockets.*
-![Execution Telemetry](https://raw.githubusercontent.com/Syed-srh/ProcessPilotAi/main/docs/screenshots/execution_telemetry.png)
 
 ---
 
