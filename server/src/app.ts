@@ -17,9 +17,22 @@ const app = express();
 app.use(helmet());
 
 // CORS config
+const clientUrlSetting = env.CLIENT_URL || '*';
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        clientUrlSetting === '*' ||
+        clientUrlSetting.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost')
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   })
 );
