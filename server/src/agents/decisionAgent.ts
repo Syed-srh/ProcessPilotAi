@@ -27,9 +27,8 @@ Determine decision output (e.g. APPROVED, REJECTED, ESCALATE) with confidence sc
 
     const result = await AIProviderRouter.generateWorkflowFromSOP(promptText);
 
-    // AI provider router was invoked -> 1 AI call
-    const isAiCall = result.providerUsed === 'GEMINI' || result.providerUsed === 'GROQ';
-    const aiCallCountIncrement = isAiCall ? 1 : 0;
+    // AI_DECISION node evaluation counts as 1 AI call in execution budget
+    const aiCallCountIncrement = 1;
 
     // Check if deterministic rules match
     const refundAmount = Number(RulesEngine.resolveFieldValue(stateVariables, 'amount') || stateVariables.refundAmount || 0);
