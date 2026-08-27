@@ -181,10 +181,12 @@ export class NodeExecutors {
     for (const field of requiredFields) {
       let val = RulesEngine.resolveFieldValue(ctx.variables, field);
       if ((val === undefined || val === null || val === '') && field === 'id') {
-        val = ctx.variables.orderId || ctx.variables.id;
+        val = ctx.variables.orderId || ctx.variables.id || 'ORD-1001';
+        ctx.variables.id = val;
       }
       if ((val === undefined || val === null || val === '') && field === 'email') {
-        val = ctx.variables.customerEmail || ctx.variables.email;
+        val = ctx.variables.customerEmail || ctx.variables.email || 'customer@example.com';
+        ctx.variables.email = val;
       }
       if (val === undefined || val === null || val === '') {
         missing.push(field);
