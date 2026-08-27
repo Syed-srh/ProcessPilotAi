@@ -43,6 +43,16 @@ const authLimiter = rateLimit({
   },
 });
 
+// Root welcome route
+app.get('/', (req, res) => {
+  res.json({
+    name: 'ProcessPilot AI Backend API',
+    status: 'online',
+    health: '/api/health',
+    message: 'ProcessPilot AI API engine active. Access the user interface via your Vercel frontend URL.',
+  });
+});
+
 // Routes
 app.use('/api', healthRoutes);
 app.use('/api/auth', authLimiter, authRoutes);
