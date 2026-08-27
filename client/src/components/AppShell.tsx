@@ -11,6 +11,8 @@ import {
   LogOut,
   ShieldAlert,
   Cpu,
+  Linkedin,
+  Github,
 } from 'lucide-react';
 import { NotificationDrawer } from './NotificationDrawer';
 
@@ -132,19 +134,55 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             })}
           </nav>
 
-          {/* SOP Core Thesis Box */}
-          <div className="p-3 rounded-lg bg-[#0D1117] border border-[#30363D] space-y-1">
-            <div className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">
-              Control Thesis
+          {/* SOP Core Thesis Box & Footer Links */}
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-[#0D1117] border border-[#30363D] space-y-1">
+              <div className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">
+                Control Thesis
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed italic font-mono">
+                "AI decides within boundaries. Workflow controls execution. Humans control high-risk actions."
+              </p>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed italic font-mono">
-              "AI decides within boundaries. Workflow controls execution. Humans control high-risk actions."
-            </p>
+
+            <div className="flex items-center justify-between px-1 text-[11px] font-mono text-slate-400">
+              <a
+                href="https://www.linkedin.com/in/1syedrahilhussain/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-400 flex items-center gap-1 transition-colors"
+              >
+                <Linkedin className="w-3.5 h-3.5 text-cyan-400" /> LinkedIn
+              </a>
+              <a
+                href="https://github.com/Syed-srh/ProcessPilotAi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white flex items-center gap-1 transition-colors"
+              >
+                <Github className="w-3.5 h-3.5" /> GitHub
+              </a>
+            </div>
           </div>
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-6 md:p-8 overflow-y-auto flex flex-col justify-between">
+          <div>{children}</div>
+
+          {/* Console Footer */}
+          <footer className="mt-12 pt-6 border-t border-[#30363D]/60 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 gap-2">
+            <span>&copy; {new Date().getFullYear()} ProcessPilot AI • Multi-Agent Operator Console</span>
+            <div className="flex items-center gap-4">
+              <a href="https://www.linkedin.com/in/1syedrahilhussain/" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400">
+                LinkedIn
+              </a>
+              <a href="https://github.com/Syed-srh/ProcessPilotAi" target="_blank" rel="noopener noreferrer" className="hover:text-slate-300">
+                GitHub
+              </a>
+            </div>
+          </footer>
+        </main>
       </div>
     </div>
   );
