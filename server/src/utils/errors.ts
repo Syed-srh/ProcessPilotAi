@@ -40,3 +40,21 @@ export class ConflictError extends AppError {
     super(message, 409);
   }
 }
+
+export function sendSuccess(res: any, statusCode: number, data: any, message?: string) {
+  return res.status(statusCode).json({
+    success: true,
+    message,
+    data,
+  });
+}
+
+export function sendError(res: any, statusCode: number, message: string) {
+  return res.status(statusCode).json({
+    success: false,
+    error: {
+      message,
+      statusCode,
+    },
+  });
+}
