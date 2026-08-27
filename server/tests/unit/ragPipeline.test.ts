@@ -6,6 +6,7 @@ import { prisma } from '../../src/config/prisma';
 
 describe('Phase 8 Step 2: Refund Policy Grounding RAG Pipeline Suite', () => {
   beforeEach(async () => {
+    RAGService.clearInMemoryStore();
     try {
       if (prisma.knowledgeDocument && prisma.knowledgeDocument.deleteMany) {
         await prisma.knowledgeDocument.deleteMany({});
