@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AgentOrchestrator } from '../../src/agents/agentOrchestrator';
+import { AIProviderRouter } from '../../src/utils/aiProviderRouter';
 import axios from 'axios';
 
 vi.mock('axios');
@@ -7,6 +8,10 @@ vi.mock('axios');
 describe('AI-Call Budget Enforcement & Breach Escalation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(AIProviderRouter, 'generateWorkflowFromSOP').mockResolvedValue({
+      workflow: { name: 'Mock', nodes: [], edges: [] },
+      providerUsed: 'GEMINI',
+    });
     (axios.post as any).mockResolvedValue({
       data: {
         candidates: [
